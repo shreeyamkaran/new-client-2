@@ -4,6 +4,7 @@ import taskReducer from "./taskSlice.ts";
 import employeeReducer from "./employeeSlice.ts";
 import managerReducer from "./managerSlice.ts";
 import userReducer from "./userSlice.ts";
+import notificationReducer from "./notificationSlice.ts";
 
 const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
         task: taskReducer,
         employee: employeeReducer,
         manager: managerReducer,
-        user: userReducer
+        user: userReducer,
+        notification: notificationReducer
     }
 });
 

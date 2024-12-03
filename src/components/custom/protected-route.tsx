@@ -1,4 +1,4 @@
-import { Fragment, ReactNode } from "react";
+import { Fragment, ReactNode, useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Unauthorised from "../pages/unauthorised";
@@ -23,7 +23,13 @@ export default function ProtectedRoute({ children, allowedRole, disallowedRole }
     if(!token) {
         return <Navigate to="/login" />
     }
-    
+
+    useEffect(() => {
+        const eventSource = new EventSource(`http://localhost:8080/api/v1/notifications/connect/Bearer${ token }`);
+        return () => {
+            eventSource.close();
+        };
+    }, []);
 
     const decodedToken = jwtDecode<MyToken>(token);
     const userRole = decodedToken.role;

@@ -1,10 +1,13 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { useTheme } from "@/utils/theme-provider";
-import { Moon, Sun, Settings, Bell, ClipboardCheck, LogOut, Menu, X } from "lucide-react";
+import { Moon, Sun, Settings, Bell, ClipboardCheck, LogOut, Menu, X, CircleArrowRight } from "lucide-react";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "../ui/sheet";
 import { jwtDecode } from "jwt-decode";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
+import { fetchAllNotifications } from "@/redux/notificationSlice";
 
 interface MyToken {
     sub: string,
@@ -31,6 +34,14 @@ export default function Navbar() {
     const token = localStorage.getItem("jwt");
     const user = jwtDecode<MyToken>(token ? token : "");
 
+    const dispatch = useDispatch();
+    const notifications = useSelector((state: RootState) => state.notification.notifications);
+    const count = useSelector((state: RootState) => state.notification.count);
+
+    useEffect(() => {
+        dispatch(fetchAllNotifications());
+    }, []);
+
     return (
         <div className="sticky z-10 top-0 backdrop-blur-lg flex justify-between items-center px-4 sm:px-20 py-2">
             <div className="flex items-center justify-between w-full">
@@ -38,7 +49,7 @@ export default function Navbar() {
                 <div className="text-xl sm:text-4xl">
                     {user.role === "ROLE_Admin" ? "bsheets" : (
                         <Link to="/" className="text-4xl">
-                            bsheets
+                            BS
                         </Link>
                     )}
                 </div>
@@ -66,10 +77,31 @@ export default function Navbar() {
                                 <Bell />
                             </Button>
                         </SheetTrigger>
-                        <SheetContent side="right">
+                        <SheetContent side="right" className="overflow-y-auto">
                             <SheetHeader>
                                 <SheetTitle>Notification Panel</SheetTitle>
-                                <SheetDescription>No new notifications.</SheetDescription>
+                                <SheetDescription></SheetDescription>
+                                {
+                                    notifications.length == 0 && <div>No new notifications.</div>
+                                }
+                                {
+                                    notifications.length > 0 &&
+                                    notifications.filter(notification => notification.readStatus == false).map(notification => {
+                                        return (
+                                            <Fragment key={ notification.id }>
+                                                <div className="relative shadow-sm rounded-md px-4 py-2 flex flex-col items-start gap-2">
+                                                    <div className="absolute h-full w-1 rounded-tl-md rounded-bl-md bg-primary left-0 top-0"></div>
+                                                    <div className="text-xl font-bold">{ notification.title }</div>
+                                                    <div className="text-xs">{ notification.description }</div>
+                                                    <div className="flex gap-2">
+                                                        <Button variant="outline" size="sm"><CircleArrowRight />Interact</Button>
+                                                        <Button variant="secondary" size="sm"><X />Dismiss</Button>
+                                                    </div>
+                                                </div>
+                                            </Fragment>
+                                        );
+                                    })
+                                }
                             </SheetHeader>
                         </SheetContent>
                     </Sheet>
@@ -153,10 +185,31 @@ export default function Navbar() {
                                     <Bell /> Notifications
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right">
+                            <SheetContent side="right" className="overflow-y-auto">
                                 <SheetHeader>
                                     <SheetTitle>Notification Panel</SheetTitle>
-                                    <SheetDescription>No new notifications.</SheetDescription>
+                                    <SheetDescription></SheetDescription>
+                                    {
+                                        notifications.length == 0 && <div>No new notifications.</div>
+                                    }
+                                    {
+                                        notifications.length > 0 &&
+                                        notifications.filter(notification => notification.readStatus == false).map(notification => {
+                                            return (
+                                                <Fragment key={ notification.id }>
+                                                    <div className="relative shadow-sm rounded-md px-4 py-2 flex flex-col items-start gap-2">
+                                                        <div className="absolute h-full w-1 rounded-tl-md rounded-bl-md bg-primary left-0 top-0"></div>
+                                                        <div className="text-xl font-bold">{ notification.title }</div>
+                                                        <div className="text-xs">{ notification.description }</div>
+                                                        <div className="flex gap-2">
+                                                            <Button variant="outline" size="sm"><CircleArrowRight />Interact</Button>
+                                                            <Button variant="secondary" size="sm"><X />Dismiss</Button>
+                                                        </div>
+                                                    </div>
+                                                </Fragment>
+                                            );
+                                        })
+                                    }
                                 </SheetHeader>
                             </SheetContent>
                         </Sheet>

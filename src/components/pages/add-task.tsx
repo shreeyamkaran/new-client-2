@@ -48,7 +48,6 @@ const formSchema = z.object({
 });
 
 export default function AddTask() {
-
     const { toast } = useToast();
     const dispatch: AppDispatch = useDispatch();
     const projects = useSelector((state: RootState) => state.task.projects);
@@ -111,10 +110,33 @@ export default function AddTask() {
                 await fetchWithAuth(`http://localhost:8080/api/v1/tasks/${ location.state.task.id }`, {
                     method: "PUT",
                     body: JSON.stringify(taskDto)
-                })
+                });
+
                 toast({
                     title: "Task edited"
                 });
+
+                if(values.markedForAppraisal == false) {
+                    return;
+                }
+                const response = await fetchWithAuth(`http://localhost:8080/api/v1/notifications/send/${ values.project.split(':')[0] }`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        "senderId": user.employeeId,
+                        "receiverId": user.employeeId,
+                        "subjectId": user.employeeId,
+                        "readStatus": false,
+                        "title": "Task added for appraisal",
+                        "description": `EmployeeId: ${ user.employeeId } has added a task for appraisal`
+                    })
+                });
+
+                const data = await response.json();
+                console.log(data);
+                toast({
+                    title: "Notification sent to the manager"
+                });
+
             }
             else {
                 // api call to create task
@@ -124,6 +146,28 @@ export default function AddTask() {
                 });
                 toast({
                     title: "Task added"
+                });
+
+                if(values.markedForAppraisal == false) {
+                    return;
+                }
+
+                const response = await fetchWithAuth(`http://localhost:8080/api/v1/notifications/send/${ values.project.split(':')[0] }`, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        "senderId": user.employeeId,
+                        "receiverId": user.employeeId,
+                        "subjectId": user.employeeId,
+                        "readStatus": false,
+                        "title": "Task added for appraisal",
+                        "description": `EmployeeId: ${ user.employeeId } has added a task for appraisal`
+                    })
+                });
+
+                const data = await response.json();
+                console.log(data);
+                toast({
+                    title: "Notification sent to the manager"
                 });
             }
         }

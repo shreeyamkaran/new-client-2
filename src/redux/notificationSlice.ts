@@ -8,7 +8,6 @@ export const fetchAllNotifications = createAsyncThunk<Notification[]>("fetchAllN
 });
 
 interface Notification {
-    id: number,
     senderId: number,
     receiverId: number,
     subjectId: number,
@@ -35,7 +34,11 @@ export const notificationSlice = createSlice({
     name: "notification",
     initialState,
     reducers: {
-
+        // Reducer to add a notification
+        addNotification: (state, action) => {
+            state.notifications.unshift(action.payload);
+            state.count += 1; // Increase the count as a new notification is added
+        }
     },
     extraReducers: (builder) => {
         builder.addCase(fetchAllNotifications.pending, (state, action) => {
@@ -45,6 +48,7 @@ export const notificationSlice = createSlice({
             state.loading = false;
             state.error = false;
             state.notifications = action.payload;
+            state.count = action.payload.length;
         });
         builder.addCase(fetchAllNotifications.rejected, (state, action) => {
             state.loading = false;
@@ -54,4 +58,5 @@ export const notificationSlice = createSlice({
     }
 });
 
+export const { addNotification } = notificationSlice.actions;
 export default notificationSlice.reducer;

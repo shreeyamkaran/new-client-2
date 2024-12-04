@@ -36,10 +36,11 @@ export default function Navbar() {
 
     const dispatch = useDispatch();
     const notifications = useSelector((state: RootState) => state.notification.notifications);
-    const count = useSelector((state: RootState) => state.notification.count);
+    const [count, setCount] = useState(0);
 
     useEffect(() => {
         dispatch(fetchAllNotifications());
+        setCount(notifications.length)
     }, []);
 
     return (
@@ -53,8 +54,6 @@ export default function Navbar() {
                         </Link>
                     )}
                 </div>
-
-                
 
                 {/* Menu Items (Hidden on Small Screens) */}
                 <div className={`lg:flex items-center gap-4 hidden flex-col lg:flex-row`}>
@@ -86,9 +85,10 @@ export default function Navbar() {
                                 }
                                 {
                                     notifications.length > 0 &&
-                                    notifications.filter(notification => notification.readStatus == false).map(notification => {
+                                    notifications.filter(notification => notification.readStatus == false && notification.receiverId == user.employeeId).map((notification, index) => {
+                                        
                                         return (
-                                            <Fragment key={ notification.id }>
+                                            <Fragment key={ index }>
                                                 <div className="relative shadow-sm rounded-md px-4 py-2 flex flex-col items-start gap-2">
                                                     <div className="absolute h-full w-1 rounded-tl-md rounded-bl-md bg-primary left-0 top-0"></div>
                                                     <div className="text-xl font-bold">{ notification.title }</div>
@@ -123,37 +123,6 @@ export default function Navbar() {
             </div>
             {/* Conditional Rendering of Mobile Menu */}
             {
-                // <div className="lg:hidden fixed top-0 left-0 right-0 bottom-0 bg-white z-50 p-4">
-                //     <div className="flex flex-col gap-4">
-                //         {user.role !== "ROLE_Admin" && (
-                //             <Button variant="outline" size="sm" onClick={() => navigate("/tasks")}>
-                //                 <ClipboardCheck />
-                //                 Tasks
-                //             </Button>
-                //         )}
-
-                //         {user.role === "ROLE_Manager" && (
-                //             <Button variant="outline" size="sm" onClick={() => navigate("/manage")}>
-                //                 <Settings />
-                //                 Manage
-                //             </Button>
-                //         )}
-
-                //         <Button variant="outline" size="sm" onClick={toggleTheme}>
-                //             {theme === "dark" ? (
-                //                 <Sun className="h-[1.2rem] w-[1.2rem]" />
-                //             ) : (
-                //                 <Moon className="h-[1.2rem] w-[1.2rem]" />
-                //             )}
-                //             Theme
-                //         </Button>
-
-                //         <Button variant="secondary" size="sm" onClick={() => navigate("/manage")}>
-                //             <LogOut />
-                //             Log Out
-                //         </Button>
-                //     </div>
-                // </div>
                 <Sheet>
                     <SheetTrigger asChild>
                         {/* Hamburger Menu for Small Screens */}
@@ -194,9 +163,9 @@ export default function Navbar() {
                                     }
                                     {
                                         notifications.length > 0 &&
-                                        notifications.filter(notification => notification.readStatus == false).map(notification => {
+                                        notifications.filter(notification => notification.readStatus == false && notification.receiverId == user.employeeId).map((notification, index) => {
                                             return (
-                                                <Fragment key={ notification.id }>
+                                                <Fragment key={ index }>
                                                     <div className="relative shadow-sm rounded-md px-4 py-2 flex flex-col items-start gap-2">
                                                         <div className="absolute h-full w-1 rounded-tl-md rounded-bl-md bg-primary left-0 top-0"></div>
                                                         <div className="text-xl font-bold">{ notification.title }</div>

@@ -36,16 +36,19 @@ export default function TaskCard({ value, task }: TaskCardProps) {
             default: return "text-yellow-400";
         }
     }
+
     return (
         <AccordionItem value={ value }>
             <AccordionTrigger>
-                <div className="grid grid-cols-3 px-2 sm:px-20 items-center w-full">
+                <div className="flex flex-col gap-2 lg:flex-row lg:justify-between px-2 sm:px-20 items-start w-full">
                     <div className="flex gap-4 justify-start">
                         <ShieldCheck className={ `${ getColor() }` } />
                         <Badge>{ task.projectName }</Badge>
                     </div>
-                    <p className="text-lg flex justify-center">{ task.title }</p>
-                    <div className="flex flex-col gap-1 items-end">
+                    <div>
+                        <p className="text-lg flex justify-center">{ task.title }</p>
+                    </div>
+                    <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                             <CalendarDays size={ 16 } />
                             <p>{ formatdate(task.date) }</p>

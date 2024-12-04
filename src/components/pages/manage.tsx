@@ -1,4 +1,4 @@
-import { CalendarDays, CircleCheckBig, Clock, Settings, ShieldCheck, Star } from "lucide-react";
+import { CalendarDays, CircleCheckBig, Clock, Menu, Settings, Star } from "lucide-react";
 import Navbar from "../custom/navbar";
 import { Button } from "../ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
@@ -16,6 +16,7 @@ import { LoadingSpinner } from "@/utils/spinner";
 import { Toaster } from "../ui/toaster";
 import { fetchWithAuth } from "@/utils/fetchWithAuth";
 import { jwtDecode } from "jwt-decode";
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from "../ui/sheet";
 
 interface MyToken {
     sub: string,
@@ -82,13 +83,6 @@ export default function Manage() {
             year: "numeric"
         });
         return formattedDate;
-    }
-
-    const getColor = (appraisalStatus: string) => {
-        switch(appraisalStatus) {
-            case "DID_NOT_APPLY": return "text-primary";
-            default: return "text-yellow-400";
-        }
     }
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>, taskId: number) => {
@@ -190,13 +184,53 @@ export default function Manage() {
         <div>
             <Navbar />
             <Toaster />
-            <div className={ `px-2 py-2 sm:px-20 sm:py-10 ${ activeId && "grid grid-cols-[1fr,2fr] gap-8" }` }>
+            <div className={ `px-2 py-2 sm:px-20 sm:py-10 ${ activeId && "grid lg:grid-cols-[1fr,2fr] gap-8" }` }>
                 <div>
-                    <div className="flex flex-col gap-2">
+                    <div className="lg:block sm:flex sm:flex-col gap-2">
                         <p className="text-2xl font-bold">Manage Employees</p>
                         <div className="mb-5 flex items-center gap-1">Working on project <Badge>{ currentProject?.name }</Badge></div>
                     </div>
-                    <Table>
+
+                    <Sheet>
+                        <SheetTrigger asChild>
+                            {/* Hamburger Menu for Small Screens */}
+                            <div className="lg:hidden flex items-center">
+                                <Button variant="outline" size="sm">
+                                    <Menu />
+                                </Button>
+                            </div>
+                        </SheetTrigger>
+                        <SheetContent side="left">
+                            <SheetTitle className="w-full"></SheetTitle>
+                            <SheetDescription className="w-full"></SheetDescription>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead className="w-1/3">Id</TableHead>
+                                        <TableHead className="w-1/3 text-center">Name</TableHead>
+                                        <TableHead className="w-1/3 text-right">Manage</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody className="font-bold">
+                                    {
+                                        employeesUnderManager.map(object => {
+                                            return (
+                                                <TableRow key={ object.id }>
+                                                    <TableCell>{ object.id }</TableCell>
+                                                    <TableCell className="text-center">{ object.name }</TableCell>
+                                                    <TableCell className="flex justify-end">
+                                                        <Button size="sm" id={ `${ object.id }-tasks` } onClick={ event => viewEmployeesTasks(event) }><Settings /></Button>
+                                                    </TableCell>
+                                                </TableRow>
+                                            );
+                                        })
+                                    }
+                                </TableBody>
+                            </Table>
+                        </SheetContent>
+                    </Sheet>
+
+                    <Table className="hidden lg:block w-full">
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-1/3">Id</TableHead>
